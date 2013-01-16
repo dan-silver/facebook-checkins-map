@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Facebook Checkins Explorer</title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/bootstrap-responsive.min.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+	<link rel="stylesheet" href="/plugins/leafletjs/leafletjs.css" />
+	<script src="/plugins/leafletjs/leafletjs.js"></script>
+	<script src="/js/jquery.min.js"></script>
+	<script>
+		$(function() {
+				var tinyIcon = L.Icon.extend({
+				options: {
+					shadowUrl: 'images/marker-shadow.png',
+					iconSize: [25, 39],
+					iconAnchor:   [12, 36],
+					shadowSize: [41, 41],
+					shadowAnchor: [12, 38],
+					popupAnchor: [0, -30]
+				}
+			});
+			var yellowIcon = new tinyIcon({ iconUrl: "images/marker-yellow.png" });
+			var map = L.map('map').setView([40, -98], 6);
+			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {detectRetina: true }).addTo(map);
+			
+			<% checkins.forEach(function(checkin) { %>
+				var marker = L.marker([<%= checkin.coords.latitude %>, <%= checkin.coords.longitude %>], { icon: yellowIcon, title: "<%= checkin.name%>"}).addTo(map);
+				marker.bindPopup("<a target=\"_blank\" href=\"<%= checkin.profile_url%>\"><img src=\"<%=checkin.profile_pic%>\"><strong><%= checkin.name%></strong></a> at <a target=\"_blank\" href=\"<%=checkin.page_url%>\"><%=checkin.page.replace(/'/g, "\'") %></a> <%= checkin.date %><br><% if (checkin.message.length) { %><i>\"<%= checkin.message.replace(/\n/g, "<br>").replace(/\*/gi,"").replace(/'/g, "\'") %>\"</i><% } %>");
+			<% }); %>
+			setTimeout(function() {
+				map.zoomOut();			
+			}, 500);
+		});
+	</script>
+	</head>	
+	<body>
+	<div id="map"></div>
+	<div id="overlay">Interactive map of Facebook checkins<br>Made by Dan Silver</div>
+	</body>
+</html>
